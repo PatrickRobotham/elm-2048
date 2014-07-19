@@ -73,26 +73,31 @@ moveRight {x} gr = if x > 0 then
                    else gr
 
 
-{- 
+
 leftRow : [Int] -> [Int]
 leftRow ls = reverse (rightRow (reverse ls))
 
-moveLeft = {x} gr = if x < 0 then 
+moveLeft {x} gr = if x < 0 then 
                         map leftRow gr
                     else gr
 
+{-
+
 transpose : [[a]] -> [[a]]
-transpose ls = if | isEmpty ls = []
-                  | isEmpty (head ls) = []
-                  | otherwise = map head ls : transpose (tail ls)
+transpose ls = if | isEmpty ls -> []
+                  | isEmpty (head ls) -> []
+                  | otherwise -> map head ls :: transpose (map tail ls)
+
 
 moveUp = 
 -}
+
+play inpt = moveLeft inpt . moveRight inpt
 
 
 -- 2048
 
 input = Keyboard.arrows
 
-main =  (lift displayGrid) (foldp moveRight grid input) 
+main =  (lift displayGrid) (foldp play grid input) 
 
