@@ -17,10 +17,24 @@ typeset x = if | x == 0  -> " "
                | otherwise ->  show x
 
 
+mono : Int -> Element 
 mono = centered . monospace . toText . typeset
 
 
-box num = (container 50 50 middle (mono num))
+border : Element -> Element
+border x = let w : Int
+               w = widthOf x
+               h : Int
+               h = heightOf x
+               rectangle : Shape
+               rectangle = rect (toFloat w) (toFloat h)
+               frame : Form
+               frame = outlined (solid black) rectangle
+               border : Element
+               border = collage  w h [outlined (solid black) rectangle]
+           in layers [border, x]
+
+box num = border (container 50 50 middle (mono num))
 
 
 displayGrid = flow down (map (flow right . map box) grid)
