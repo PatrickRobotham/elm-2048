@@ -58,7 +58,7 @@ leftRow lst = let solids = filter (\x -> x /= 0) lst
                   x4 = index 3
                   moveLeftTwo ls = if (x1 ls == x2 ls) then [x1 ls + x2 ls,  0] else [x1 ls, x2 ls]
                   moveLeftThree ls = if (x1 ls == x2 ls) then [x1 ls + x2 ls, x3 ls, 0] else [x1 ls] ++  moveLeftTwo [x2 ls, x3 ls]
-                  moveLeftFour ls = if (x1 ls == x2 ls) then [x1 ls + x2 ls] ++ moveLeftTwo [x3 ls, x4 ls] ++ [0] else  [x1 ls] ++ moveLeftThree ls 
+                  moveLeftFour ls = if (x1 ls == x2 ls) then [x1 ls + x2 ls] ++ moveLeftTwo [x3 ls, x4 ls] ++ [0] else  [x1 ls] ++ moveLeftThree (tail ls) 
              in
                if | n < 2 -> solids ++ repeat (4 - n) 0
                   | n == 2 -> moveLeftTwo solids ++ repeat 2 0 
@@ -111,4 +111,5 @@ keys = Keyboard.arrows
 
 input = lift2 (,) keys (Random.range 0 16 keys)
 
-main =  (lift displayGrid) (foldp play state input)  
+-- main =  (lift displayGrid) (foldp play state input)  
+main = flow right (map box (leftRow [8,4,2,2]))
