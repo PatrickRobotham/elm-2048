@@ -8,7 +8,7 @@ import Random
 import Array
 -- Model
 
-state = {grid = [[2,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]], turn = True}
+state = {grid = [[2,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]], turn = False}
 
 -- Display
 
@@ -42,32 +42,29 @@ displayGrid inpt = flow down (map (flow right . map box) inpt.grid)
 
 
 
-rightCell : Int -> [Int] -> [Int]
--- takes the (1-indexed) position of a cell in a row, and returns
--- the result of moving that cell right.
--- Starts from the rightmost cell.
-rightCell x ls = let width = length ls
-                     lefts = take (x-1) ls
-                     cell = head (drop (x-1) (take x ls))
-                     rights = drop x ls 
-                     spaces = filter (\x -> x == 0) rights
-                     solids = filter (\x -> x /= 0) rights
-                 in 
-                   if | x == width -> ls
-                      | isEmpty solids -> lefts ++ rights ++ [cell]
-                      | head solids == cell -> lefts ++ spaces ++ 
-                                               (0 :: cell*2 :: tail solids)
-                      | otherwise -> lefts ++ spaces ++ [cell] ++ solids
-
 rightRow : [Int] -> [Int]
 -- moves all the cells in a row to the right
-rightRow ls = foldr rightCell ls [1..length ls]
+rightRow ls = (reverse . leftRow . reverse) ls
 
 moveRight :  [[Int]] -> [[Int]]
 moveRight gr = map rightRow gr
                
 leftRow : [Int] -> [Int]
-leftRow ls = reverse (rightRow (reverse ls))
+leftRow lst = let solids = filter (\x -> x /= 0) lst
+                  n = length solids
+                  x1 = index 0
+                  x2 = index 1
+                  x3 = index 2
+                  x4 = index 3
+                  moveLeftTwo ls = if (x1 ls == x2 ls) then [x1 ls + x2 ls,  0] else [x1 ls, x2 ls]
+                  moveLeftThree ls = if (x1 ls == x2 ls) then [x1 ls + x2 ls, x3 ls, 0] else [x1 ls] ++  moveLeftTwo [x2 ls, x3 ls]
+                  moveLeftFour ls = if (x1 ls == x2 ls) then [x1 ls + x2 ls] ++ moveLeftTwo [x3 ls, x4 ls] ++ [0] else  [x1 ls] ++ moveLeftThree ls 
+             in
+               if | n < 2 -> solids ++ repeat (4 - n) 0
+                  | n == 2 -> moveLeftTwo solids ++ repeat 2 0 
+                  | n == 3 -> moveLeftThree solids ++ repeat 1 0
+                  | n == 4 -> moveLeftFour solids
+                              
 
 moveLeft gr = map leftRow gr
                     
@@ -114,5 +111,4 @@ keys = Keyboard.arrows
 
 input = lift2 (,) keys (Random.range 0 16 keys)
 
-main =  (lift displayGrid) (foldp play state input)
-
+main =  (lift displayGrid) (foldp play state input)  
