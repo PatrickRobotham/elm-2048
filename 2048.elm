@@ -111,5 +111,4 @@ keys = Keyboard.arrows
 
 input = lift2 (,) keys (Random.range 0 16 keys)
 
--- main =  (lift displayGrid) (foldp play state input)  
-main = flow right (map box (leftRow [8,4,2,2]))
+main =  (lift displayGrid) (foldp play state input)  
