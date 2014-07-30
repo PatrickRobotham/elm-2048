@@ -1,0 +1,306 @@
+<!DOCTYPE HTML>
+<html><head><meta charset="UTF-8"><title>2048</title><script type="text/javascript" src="/usr/local/share/elm/elm-runtime.js"></script><script type="text/javascript">Elm.Main = Elm.Main || {};
+Elm.Main.make = function (_elm) {
+   "use strict";
+   _elm.Main = _elm.Main || {};
+   if (_elm.Main.values)
+   return _elm.Main.values;
+   var _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   _A = _N.Array.make(_elm),
+   _E = _N.Error.make(_elm),
+   $moduleName = "Main";
+   var Array = Elm.Array.make(_elm);
+   var Basics = Elm.Basics.make(_elm);
+   var Char = Elm.Char.make(_elm);
+   var Color = Elm.Color.make(_elm);
+   var Graphics = Graphics || {};
+   Graphics.Collage = Elm.Graphics.Collage.make(_elm);
+   var Graphics = Graphics || {};
+   Graphics.Element = Elm.Graphics.Element.make(_elm);
+   var Graphics = Graphics || {};
+   Graphics.Input = Elm.Graphics.Input.make(_elm);
+   var Keyboard = Elm.Keyboard.make(_elm);
+   var List = Elm.List.make(_elm);
+   var Maybe = Elm.Maybe.make(_elm);
+   var Native = Native || {};
+   Native.Json = Elm.Native.Json.make(_elm);
+   var Native = Native || {};
+   Native.Ports = Elm.Native.Ports.make(_elm);
+   var Random = Elm.Random.make(_elm);
+   var Signal = Elm.Signal.make(_elm);
+   var String = Elm.String.make(_elm);
+   var Text = Elm.Text.make(_elm);
+   var Time = Elm.Time.make(_elm);
+   var Window = Elm.Window.make(_elm);
+   var _op = {};
+   var keys = Keyboard.arrows;
+   var input = A3(Signal.lift2,
+   F2(function (v0,v1) {
+      return {ctor: "_Tuple2"
+             ,_0: v0
+             ,_1: v1};
+   }),
+   keys,
+   A3(Random.range,0,16,keys));
+   var coords = A2(List.concatMap,
+   function (x) {
+      return A2(List.zip,
+      A2(List.repeat,4,x),
+      _L.range(0,3));
+   },
+   _L.range(0,3));
+   var index = F2(function (n,xs) {
+      return _U.eq(n,
+      0) ? List.head(xs) : A2(index,
+      n - 1,
+      List.tail(xs));
+   });
+   var lookup = F2(function (_v0,
+   ls) {
+      return function () {
+         switch (_v0.ctor)
+         {case "_Tuple2":
+            return A2(index,
+              _v0._1,
+              A2(index,_v0._0,ls));}
+         _E.Case($moduleName,
+         "on line 84, column 19 to 38");
+      }();
+   });
+   var place = F2(function (seed,
+   gr) {
+      return function () {
+         var ar = Array.fromList(A2(List.map,
+         Array.fromList,
+         gr));
+         var empty = function (_v4) {
+            return function () {
+               switch (_v4.ctor)
+               {case "_Tuple2":
+                  return _U.eq(A2(lookup,
+                    {ctor: "_Tuple2"
+                    ,_0: _v4._0
+                    ,_1: _v4._1},
+                    gr),
+                    0);}
+               _E.Case($moduleName,
+               "on line 90, column 35 to 55");
+            }();
+         };
+         var spaces = A2(List.filter,
+         empty,
+         coords);
+         var $ = A2(index,
+         A2(Basics.mod,
+         seed,
+         List.length(spaces)),
+         spaces),
+         i = $._0,
+         j = $._1;
+         var updatedRow = A3(Array.set,
+         j,
+         2,
+         A2(Array.getOrFail,i,ar));
+         return Array.toList(A2(Array.map,
+         Array.toList,
+         A3(Array.set,i,updatedRow,ar)));
+      }();
+   });
+   var transpose = function (ls) {
+      return List.isEmpty(ls) ? _L.fromArray([]) : List.isEmpty(List.head(ls)) ? _L.fromArray([]) : {ctor: "::"
+                                                                                                    ,_0: A2(List.map,
+                                                                                                    List.head,
+                                                                                                    ls)
+                                                                                                    ,_1: transpose(A2(List.map,
+                                                                                                    List.tail,
+                                                                                                    ls))};
+   };
+   var leftRow = function (lst) {
+      return function () {
+         var x4 = index(3);
+         var x3 = index(2);
+         var x2 = index(1);
+         var x1 = index(0);
+         var moveLeftTwo = function (ls) {
+            return _U.eq(x1(ls),
+            x2(ls)) ? _L.fromArray([x1(ls) + x2(ls)
+                                   ,0]) : _L.fromArray([x1(ls)
+                                                       ,x2(ls)]);
+         };
+         var moveLeftThree = function (ls) {
+            return _U.eq(x1(ls),
+            x2(ls)) ? _L.fromArray([x1(ls) + x2(ls)
+                                   ,x3(ls)
+                                   ,0]) : _L.append(_L.fromArray([x1(ls)]),
+            moveLeftTwo(_L.fromArray([x2(ls)
+                                     ,x3(ls)])));
+         };
+         var moveLeftFour = function (ls) {
+            return _U.eq(x1(ls),
+            x2(ls)) ? _L.append(_L.fromArray([x1(ls) + x2(ls)]),
+            _L.append(moveLeftTwo(_L.fromArray([x3(ls)
+                                               ,x4(ls)])),
+            _L.fromArray([0]))) : _L.append(_L.fromArray([x1(ls)]),
+            moveLeftThree(List.tail(ls)));
+         };
+         var solids = A2(List.filter,
+         function (x) {
+            return !_U.eq(x,0);
+         },
+         lst);
+         var n = List.length(solids);
+         return _U.cmp(n,
+         2) < 0 ? _L.append(solids,
+         A2(List.repeat,
+         4 - n,
+         0)) : _U.eq(n,
+         2) ? _L.append(moveLeftTwo(solids),
+         A2(List.repeat,2,0)) : _U.eq(n,
+         3) ? _L.append(moveLeftThree(solids),
+         A2(List.repeat,1,0)) : _U.eq(n,
+         4) ? moveLeftFour(solids) : _E.If($moduleName,
+         "between lines 63 and 66");
+      }();
+   };
+   var moveLeft = function (gr) {
+      return A2(List.map,
+      leftRow,
+      gr);
+   };
+   var moveUp = function (gr) {
+      return transpose(moveLeft(transpose(gr)));
+   };
+   var rightRow = function (ls) {
+      return function ($) {
+         return List.reverse(leftRow(List.reverse($)));
+      }(ls);
+   };
+   var moveRight = function (gr) {
+      return A2(List.map,
+      rightRow,
+      gr);
+   };
+   var moveDown = function (gr) {
+      return transpose(moveRight(transpose(gr)));
+   };
+   var play = F2(function (_v8,
+   gr) {
+      return function () {
+         switch (_v8.ctor)
+         {case "_Tuple2":
+            return gr.turn ? _U.replace([["grid"
+                                         ,A2(place,_v8._1,gr.grid)]
+                                        ,["turn",false]],
+              gr) : _U.cmp(_v8._0.x,
+              0) > 0 ? _U.replace([["grid"
+                                   ,moveRight(gr.grid)]
+                                  ,["turn"
+                                   ,!_U.eq(moveRight(gr.grid),
+                                   gr.grid)]],
+              gr) : _U.cmp(_v8._0.x,
+              0) < 0 ? _U.replace([["grid"
+                                   ,moveLeft(gr.grid)]
+                                  ,["turn"
+                                   ,!_U.eq(moveLeft(gr.grid),
+                                   gr.grid)]],
+              gr) : _U.cmp(_v8._0.y,
+              0) > 0 ? _U.replace([["grid"
+                                   ,moveUp(gr.grid)]
+                                  ,["turn"
+                                   ,!_U.eq(moveUp(gr.grid),
+                                   gr.grid)]],
+              gr) : _U.cmp(_v8._0.y,
+              0) < 0 ? _U.replace([["grid"
+                                   ,moveDown(gr.grid)]
+                                  ,["turn"
+                                   ,!_U.eq(moveDown(gr.grid),
+                                   gr.grid)]],
+              gr) : gr;}
+         _E.Case($moduleName,
+         "between lines 100 and 105");
+      }();
+   });
+   var border = function (x) {
+      return function () {
+         var h = Graphics.Element.heightOf(x);
+         var w = Graphics.Element.widthOf(x);
+         var rectangle = A2(Graphics.Collage.rect,
+         Basics.toFloat(w),
+         Basics.toFloat(h));
+         var frame = A2(Graphics.Collage.outlined,
+         Graphics.Collage.solid(Color.black),
+         rectangle);
+         var border = A3(Graphics.Collage.collage,
+         w,
+         h,
+         _L.fromArray([A2(Graphics.Collage.outlined,
+         Graphics.Collage.solid(Color.black),
+         rectangle)]));
+         return Graphics.Element.layers(_L.fromArray([border
+                                                     ,x]));
+      }();
+   };
+   var typeset = function (x) {
+      return _U.eq(x,
+      0) ? " " : String.show(x);
+   };
+   var mono = function ($) {
+      return Text.centered(Text.monospace(Text.toText(typeset($))));
+   };
+   var box = function (num) {
+      return border(A4(Graphics.Element.container,
+      50,
+      50,
+      Graphics.Element.middle,
+      mono(num)));
+   };
+   var displayGrid = function (inpt) {
+      return A2(Graphics.Element.flow,
+      Graphics.Element.down,
+      A2(List.map,
+      function ($) {
+         return Graphics.Element.flow(Graphics.Element.right)(List.map(box)($));
+      },
+      inpt.grid));
+   };
+   var state = {_: {}
+               ,grid: _L.fromArray([_L.fromArray([2
+                                                 ,0
+                                                 ,0
+                                                 ,0])
+                                   ,_L.fromArray([0,0,0,0])
+                                   ,_L.fromArray([0,0,0,0])
+                                   ,_L.fromArray([0,0,0,0])])
+               ,turn: false};
+   var main = A2(Signal.lift,
+   displayGrid,
+   A3(Signal.foldp,
+   play,
+   state,
+   input));
+   _elm.Main.values = {_op: _op
+                      ,state: state
+                      ,typeset: typeset
+                      ,mono: mono
+                      ,border: border
+                      ,box: box
+                      ,displayGrid: displayGrid
+                      ,rightRow: rightRow
+                      ,moveRight: moveRight
+                      ,leftRow: leftRow
+                      ,moveLeft: moveLeft
+                      ,transpose: transpose
+                      ,moveUp: moveUp
+                      ,moveDown: moveDown
+                      ,index: index
+                      ,lookup: lookup
+                      ,coords: coords
+                      ,place: place
+                      ,play: play
+                      ,keys: keys
+                      ,input: input
+                      ,main: main};
+   return _elm.Main.values;
+};</script></head><body><script type="text/javascript">Elm.fullscreen(Elm.Main)</script><noscript></noscript></body></html>
